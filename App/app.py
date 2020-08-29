@@ -51,7 +51,7 @@ def loadCSVFile (file, sep=";"):
     Returns: None  
     """
     lst = lt.newList("ARRAY_LIST") #Usando implementacion arraylist
-    #lst = lt.newList() #Usando implementacion linkedlist
+    #lst = lt.newList("LINKED_LIST") #Usando implementacion linkedlist
     print("Cargando archivo ....")
     t1_start = process_time() #tiempo inicial
     dialect = csv.excel()
@@ -137,11 +137,19 @@ def countElementsByCriteria(criteria, lst, lst2):
                         calificacion += float(Man["vote_average"])
                     n += 1
             a += 1
-        calificacion = round(float(calificacion)/float(total),1)
+        if total != 0:
+            calificacion = round(float(calificacion)/float(total),1)
         t2 = process_time()
-        print ("El autor ", criteria, " tiene ", total," peliculas: \n",Min,"\n Tiene una calificacion promedio de ",calificacion)
-        print ("tiempo de ejecucion de: ",t2 - t1)
-
+        x = {"Nombre autor": criteria,
+            "Peliculas realizadas": total,
+            "Calificacion promedio": calificacion,
+            "Lista peliculas": Min}
+        print("Tiempo de ejecucion",t2-t1,"Segundos")
+        if total == 0:
+            print("Autor no se encuentra")
+        else:
+            return x
+    
 def orderElementsByCriteria(function, column, lst, elements):
     """
     Retorna una lista con cierta cantidad de elementos ordenados por el criterio
@@ -171,10 +179,9 @@ def BestoPeliculas(lst):
         Coco = it.newIterator(ava)
         while it.hasNext(Coco) and B < 11:
             Mina = it.next(Coco)
-            S = [Mina["original_title"],":", Mina["vote_count"]]
+            S = [Mina["original_title"], Mina["vote_count"]]
             Datos1.append(S)
             B += 1
-
         vc = lst
         Sh.shellSort(vc, less_vote_average)
         A = 1
@@ -185,8 +192,10 @@ def BestoPeliculas(lst):
             Datos2.append(N)
             A +=1
         time2 = process_time()
-    print("Las mejores peliculas por conteo de votos son: \n",Datos1, "Y las peores por promedio son: \n", Datos2,"\n Tiempo de proceso: ",time2-time1)
-
+        x = {"Mejores peliculas por conteo de votos": Datos1,
+            "Peores peliculas por promedio": Datos2}
+        print("Tiempo de ejecucion",time2-time1,"Segundos")
+        return x
 
 def dame_tu_autografo(lst, lst2, actor):
     if lst["size"] == 0 or lst2["size"]==0:
@@ -226,11 +235,23 @@ def dame_tu_autografo(lst, lst2, actor):
             if directores[sayori] > mayor:
                 mayor = directores[sayori]
                 name = sayori
-        prom = round(prom/conteo, 1)
+        if prom != 0:
+            prom = round(prom/conteo, 1)
         time2 = process_time()
-    print ("El actor",actor,"participo en",conteo,"peliculas:\n",Datos,"\nLa calificación promedio de sus peliculas es:",prom,"\n y colaboro mas con el director:",name,"\n Tiempo de procesado:",time2-time1,"segundos")
+        x = {"Nombre actor": actor,
+            "No. de peliculas realizadas": conteo,
+            "Promedio de las peliculas": prom,
+            "Director con mayor colaboracion":name,
+            "Titulos de las peliculas":Datos}
+        print("Tiempo de ejecucion",time2-time1,"Segundos")
+        if conteo == 0:
+            print("Actor no existe")
+        else:
+            return x
 
 def peliculas_por_genero(lst, genero):
+    genero = genero.lower()
+    genero = genero.capitalize()
     a =[]
     conteo = 0
     prom = 0
@@ -244,8 +265,15 @@ def peliculas_por_genero(lst, genero):
             conteo += 1
     prom = round(float(prom/conteo),1)
     time2 = process_time()
-    print("Las peliculas con el genero",genero,"son en total:",conteo,"\n",a,"\ncon un promedio total de:",prom,"\nEl tiempo promedio es: ",time2-time1,"segundos")
-
+    x = {"Genero": genero,
+        "Numero de peliculas": conteo,
+        "Promedio votacion de las peliculas": prom,
+        "Lista de las peliculas": a}
+    if conteo == 0:
+        print("Genero no encontrado")
+    else:
+        print("tiempo ejecucion",time2-time1,"Segundos")
+        return x
 
 def main():
     """
@@ -270,7 +298,7 @@ def main():
                 print("Datos cargados, ",lista['size']," elementos cargados")
                 print("Datos cargados, ",lista2['size']," elementos cargados")
             elif int(inputs[0])==2: #opcion 2
-                    a = input("¿De cual lista quiere saber el tamaño?(Details:lista, Casting:lista2")
+                    a = input("¿De cual lista quiere saber el tamaño?(Details:lista, Casting:lista2)  ")
                     if a == "lista": 
                         print("La lista tiene",lista["size"],"elementos")#obtener la longitud de la lista
                     elif a == "lista2":
@@ -289,24 +317,24 @@ def main():
                     print("La lista esta vacía")
                 else:
                     criteria =input('Ingrese el criterio de búsqueda\n')
-                    counter=countElementsByCriteria(criteria, lista, lista2)
+                    print(countElementsByCriteria(criteria, lista, lista2))
             elif int(inputs[0])==5:
                 if lista==None or lista["size"]==0 or lista2['size']==0:
                     print("La lista esta vacia mi colta")
                 else:
-                    BestoPeliculas(lista)
+                    print(BestoPeliculas(lista))
             elif int(inputs[0])==6:
                 if lista==None or lista['size']==0: #obtener la longitud de la lista
                     print("La lista esta vacía")
                 else: 
                     actor = input("Nombre del actor que desea conocer: ")
-                    dame_tu_autografo(lista, lista2, actor)
+                    print(dame_tu_autografo(lista, lista2, actor))
             elif int(inputs[0])==7:
                 if lista==None or lista['size']==0: #obtener la longitud de la lista
                     print("La lista esta vacía")
                 else: 
                     genero = input("Nombre del genero: ")
-                    peliculas_por_genero(lista, genero)
+                    print(peliculas_por_genero(lista, genero))
             elif int(inputs[0])==0: #opcion 0, salir
                 sys.exit(0)
                 
