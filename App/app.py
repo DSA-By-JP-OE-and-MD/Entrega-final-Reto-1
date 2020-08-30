@@ -347,8 +347,9 @@ def ranking_por_genero(lst, genero, orden):
                 "Promedio de cantidad de votos": promCV,
                 "El top 10 de las peliculas por valificacion en orden "+orden+" son": Datos2,
                 "Promedio de calificacion": promC}
-            return x
             print("Tiempo de ejecucion",time2-time1,"segundo")
+            return x
+            
 
 
 def main():
