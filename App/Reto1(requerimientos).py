@@ -368,7 +368,7 @@ def main():
         if len(inputs)>0:
             if int(inputs[0])==1: #opcion 1
                 #file = input("Escriba el nombre del archivo: ")
-                file = inut("ingrese el archivo detalles")
+                file = input("ingrese el archivo detalles")
                 file2 = input("ingrese el archivo casting")
                 lista = loadCSVFile(file) #llamar funcion cargar datos
                 lista2 = loadCSVFile(file2)
