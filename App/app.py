@@ -77,10 +77,11 @@ def printMenu():
     print("1- Cargar Datos")
     print("2- Contar los elementos de la Lista")
     print("3- Contar elementos filtrados por palabra clave")
-    print("4- Consultar informacion de un director")
-    print("5- Consultar las 10 mejores y peores peliculas por votos")
-    print("6- Consultar informacion de un actor")
-    print("7- Consultar peliculas por genero")
+    print("4- (Req-3)Consultar informacion de un director")
+    print("5- (Req-2)Consultar las 10 mejores y peores peliculas por votos y calificación")
+    print("6- (Req-4)Consultar informacion de un actor")
+    print("7- (Req-5)Consultar peliculas por genero")
+    print("8- (Req-6)Consultar el top de peliculas por genero")
     print("0- Salir")
 
 def countElementsFilteredByColumn(criteria, column, lst):
@@ -159,9 +160,18 @@ def high_vote_count(ele1, ele2):
     if int(ele1["vote_count"]) > int(ele2["vote_count"]):
         return True
     return False
+def less_vote_count(ele1, ele2):
+    if int(ele1["vote_count"]) < int(ele2["vote_count"]):
+        return True
+    return False
 
 def less_vote_average(ele1, ele2):
     if float(ele1["vote_average"]) < float(ele2["vote_average"]):
+        return True
+    return False
+
+def high_vote_average(ele1, ele2):
+    if float(ele1["vote_average"]) > float(ele2["vote_average"]):
         return True
     return False
 
@@ -250,30 +260,96 @@ def dame_tu_autografo(lst, lst2, actor):
             return x
 
 def peliculas_por_genero(lst, genero):
-    genero = genero.lower()
-    genero = genero.capitalize()
-    a =[]
-    conteo = 0
-    prom = 0
-    time1 =process_time()
-    doki = it.newIterator(lst)
-    while it.hasNext(doki):
-        waku = it.next(doki)
-        if genero in waku["genres"]:
-            a.append(waku["original_title"])
-            prom += float(waku["vote_average"])
-            conteo += 1
-    prom = round(float(prom/conteo),1)
-    time2 = process_time()
-    x = {"Genero": genero,
-        "Numero de peliculas": conteo,
-        "Promedio votacion de las peliculas": prom,
-        "Lista de las peliculas": a}
-    if conteo == 0:
-        print("Genero no encontrado")
+    if lst["size"] == 0:
+        print("La lista esta vacia")
     else:
-        print("tiempo ejecucion",time2-time1,"Segundos")
-        return x
+        time1 =process_time()
+        genero = genero.lower()
+        genero = genero.capitalize()
+        a =[]
+        conteo = 0
+        prom = 0
+        doki = it.newIterator(lst)
+        while it.hasNext(doki):
+            waku = it.next(doki)
+            if genero in waku["genres"]:
+                a.append(waku["original_title"])
+                prom += float(waku["vote_average"])
+                conteo += 1
+        prom = round(float(prom/conteo),1)
+        time2 = process_time()
+        x = {"Genero": genero,
+            "Numero de peliculas": conteo,
+            "Promedio votacion de las peliculas": prom,
+            "Lista de las peliculas": a}
+        if conteo == 0:
+            print("Genero no encontrado")
+        else:
+            print("tiempo ejecucion",time2-time1,"Segundos")
+            return x
+
+def ranking_por_genero(lst, genero, orden):
+    if lst["size"] == 0:
+        print("La lista es vacia")
+    else:
+        time1 = process_time()
+        genero = genero.capitalize()
+        orden = orden.lower()
+        Datos1 = []
+        Datos2 =[]
+        conteo = 10
+        promC = 0
+        promCV = 0
+        zed = lst
+        if orden == "ascendente":
+            Sh.shellSort(zed, high_vote_count)
+        elif orden == "descendente":
+            Sh.shellSort(zed, less_vote_count)
+        B = 1
+        D = 0
+        Coco = it.newIterator(zed)
+        while it.hasNext(Coco) and D < 10 and B < zed["size"]:
+            Mina = it.next(Coco)
+            if genero in Mina["genres"]:
+                S = [Mina["original_title"], Mina["vote_count"]]
+                Datos1.append(S)
+                promCV += float(Mina["vote_count"])
+                D += 1
+            B += 1
+
+        
+        shen = lst
+        if orden == "ascendente":
+            Sh.shellSort(shen, high_vote_average)
+        elif orden == "descendente":
+            Sh.shellSort(shen, less_vote_average)
+        A = 1
+        C = 0
+        Menhe = it.newIterator(shen)
+        while it.hasNext(Menhe) and C < 10 and A < shen["size"]:
+            Alta = it.next(Menhe)
+            if genero in Alta["genres"]:
+                N = [Alta["original_title"], Alta["vote_average"]]
+                Datos2.append(N)
+                promC += float(Alta["vote_average"])
+                C += 1
+            A +=1
+        
+        if conteo != 0:
+            promC = round(float(promC/conteo),0)
+            promCV = round(float(promCV/conteo),1)
+            time2 = process_time()
+        if conteo == None:
+            print("No se encontro ninguna pelicula con el genero introducido")
+        else:
+            x = {"Genero": genero,
+                "El top 10 de las peliculas con cantidad de votos "+orden+" son": Datos1,
+                "Promedio de cantidad de votos": promCV,
+                "El top 10 de las peliculas por valificacion en orden "+orden+" son": Datos2,
+                "Promedio de calificacion": promC}
+            return x
+            print("Tiempo de ejecucion",time2-time1,"segundo")
+
 
 def main():
     """
@@ -335,6 +411,13 @@ def main():
                 else: 
                     genero = input("Nombre del genero: ")
                     print(peliculas_por_genero(lista, genero))
+            elif int(inputs[0])==8:
+                if lista==None or lista['size']==0: #obtener la longitud de la lista
+                    print("La lista esta vacía")
+                else: 
+                    genero = str(input("Nombre del genero: "))
+                    orden = input("Orden de las peliculas(ascendento o descendente): ")
+                    print(ranking_por_genero(lista, genero, orden))
             elif int(inputs[0])==0: #opcion 0, salir
                 sys.exit(0)
                 
